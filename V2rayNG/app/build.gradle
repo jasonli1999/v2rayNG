@@ -13,7 +13,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.v2ray.ang"
+        applicationId "com.v2ray.anggo"
         minSdkVersion 21
         targetSdkVersion Integer.parseInt("$targetSdkVer")
         multiDexEnabled true
@@ -91,6 +91,16 @@ android {
     }
     namespace 'com.v2ray.ang'
     testNamespace 'com.v2ray.angTest'
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+
 }
 
 dependencies {
@@ -132,4 +142,5 @@ dependencies {
     implementation 'com.blacksquircle.ui:language-json:2.8.0'
     implementation 'io.github.g00fy2.quickie:quickie-bundled:1.6.0'
     implementation 'com.google.zxing:core:3.5.1'
+    implementation(fileTree("libs"))
 }
