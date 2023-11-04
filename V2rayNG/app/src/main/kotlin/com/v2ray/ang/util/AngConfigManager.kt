@@ -147,8 +147,7 @@ object AngConfigManager {
                         if (TextUtils.isEmpty(vmessBean.security) && TextUtils.isEmpty(vmessBean.id)) {
                             server.users = null
                         } else {
-                            val socksUsersBean =
-                                V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
+                            val socksUsersBean = V2rayConfig.OutboundBean.OutSettingsBean.ServersBean.SocksUsersBean()
                             socksUsersBean.user = vmessBean.security
                             socksUsersBean.pass = vmessBean.id
                             server.users = listOf(socksUsersBean)

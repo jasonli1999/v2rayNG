@@ -66,8 +66,10 @@ object V2RayServiceManager {
             context.toast(R.string.toast_services_start)
         }
         val intent = if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
+            Log.e("========intent=====","1")
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
+            Log.e("========intent=====","2")
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
@@ -300,8 +302,7 @@ object V2RayServiceManager {
     private fun createNotificationChannel(): String {
         val channelId = "RAY_NG_M_CH_ID"
         val channelName = "V2rayNG Background Service"
-        val chan = NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_HIGH)
+        val chan = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
         chan.lightColor = Color.DKGRAY
         chan.importance = NotificationManager.IMPORTANCE_NONE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
