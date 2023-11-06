@@ -194,7 +194,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             return
         }
         showCircle()
-//        toast(R.string.toast_services_start)
         V2RayServiceManager.startV2Ray(this)
         hideCircle()
     }
@@ -515,7 +514,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 if (!Utils.isValidUrl(url)) {
                     return@forEach
                 }
-                Log.d(ANG_PACKAGE, url)
+                Log.e(ANG_PACKAGE, url)
                 lifecycleScope.launch(Dispatchers.IO) {
                     val configText = try {
                         Utils.getUrlContentWithCustomUserAgent(url)

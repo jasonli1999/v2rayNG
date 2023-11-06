@@ -1,5 +1,6 @@
 package com.v2ray.ang.util
 
+import android.util.Log
 import com.google.gson.Gson
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.dto.ServerAffiliationInfo
@@ -23,6 +24,7 @@ object MmkvManager {
 
     fun decodeServerList(): MutableList<String> {
         val json = mainStorage?.decodeString(KEY_ANG_CONFIGS)
+        Log.e("json",json.toString())
         return if (json.isNullOrBlank()) {
             mutableListOf()
         } else {

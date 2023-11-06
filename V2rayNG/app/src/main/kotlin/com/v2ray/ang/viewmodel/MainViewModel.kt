@@ -54,10 +54,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun reloadServerList() {
         serverList = MmkvManager.decodeServerList()
+        Log.e("serverList", serverList.toString())
         updateCache()
         updateListAction.value = -1
     }
 
+    /**
+     *  单点删除
+     */
     fun removeServer(guid: String) {
         serverList.remove(guid)
         MmkvManager.removeServer(guid)
@@ -89,6 +93,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         serversCache.clear()
         for (guid in serverList) {
             val config = MmkvManager.decodeServerConfig(guid) ?: continue
+            Log.e("config", config.toString())
             if (subscriptionId.isNotEmpty() && subscriptionId != config.subscriptionId) {
                 continue
             }
@@ -132,6 +137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.Default) { // without Dispatchers.Default viewModelScope will launch in main thread
             for (item in serversCache) {
                 val config = V2rayConfigUtil.getV2rayConfig(getApplication(), item.guid)
+                Log.e("config", config.toString())
                 if (config.status) {
                     MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG, Pair(item.guid, config.content))
                 }

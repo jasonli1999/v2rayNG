@@ -80,9 +80,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onCreate() {
         super.onCreate()
-
+        //StrictMode是一个开发者工具，常用于捕获在应用主线程中发生的磁盘I/O、网络访问违例等问题。
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
+        //软引用？？
         V2RayServiceManager.serviceControl = SoftReference(this)
     }
 
@@ -101,6 +102,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     private fun setup() {
+
         val prepare = prepare(this)
         if (prepare != null) {
             return
@@ -185,6 +187,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         try {
             mInterface = builder.establish()!!
             isRunning = true
+            Log.e("====","runTun2socks")
             runTun2socks()
         } catch (e: Exception) {
             // non-nullable lateinit var
@@ -213,7 +216,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             cmd.add("--dnsgw")
             cmd.add("127.0.0.1:${localDnsPort}")
         }
-        Log.d(packageName, cmd.toString())
+        Log.e(packageName, cmd.toString())
 
         try {
             val proBuilder = ProcessBuilder(cmd)
@@ -230,7 +233,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     runTun2socks()
                 }
             }).start()
-            Log.d(packageName, process.toString())
+            Log.e(packageName, process.toString())
 
             sendFd()
         } catch (e: Exception) {
@@ -241,13 +244,13 @@ class V2RayVpnService : VpnService(), ServiceControl {
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.d(packageName, path)
+        Log.e(packageName, path)
 
         GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
-                Log.d(packageName, "sendFd tries: $tries")
+                Log.e(packageName, "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))

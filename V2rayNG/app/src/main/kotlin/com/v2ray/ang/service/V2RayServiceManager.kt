@@ -66,12 +66,14 @@ object V2RayServiceManager {
             context.toast(R.string.toast_services_start)
         }
         val intent = if (settingsStorage?.decodeString(AppConfig.PREF_MODE) ?: "VPN" == "VPN") {
-            Log.e("========intent=====","V2RayVpnService")
+            Log.e("===开启服务=1===","V2RayVpnService")
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
-            Log.e("========intent=====","V2RayProxyOnlyService")
+            Log.e("=====开启服务=2==","V2RayProxyOnlyService")
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
+
+       // 在Android8.0的行为变更说明中，我们看到，不在允许随意创建 后台服务，所以改为 调用 startForegroundService的形式。
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
             context.startForegroundService(intent)
         } else {
