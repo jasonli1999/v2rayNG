@@ -115,6 +115,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
 
+        Log.e("routingMode", "setup:$routingMode ", )
+
         builder.setMtu(VPN_MTU)
         builder.addAddress(PRIVATE_VLAN4_CLIENT, 30)
         //builder.addDnsServer(PRIVATE_VLAN4_ROUTER)
@@ -187,7 +189,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         try {
             mInterface = builder.establish()!!
             isRunning = true
-            Log.e("====","runTun2socks")
+            Log.e("=======","runTun2socks")
             runTun2socks()
         } catch (e: Exception) {
             // non-nullable lateinit var
@@ -286,7 +288,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         }
 
         try {
-            Log.d(packageName, "tun2socks destroy")
+            Log.e(packageName, "tun2socks destroy")
             process.destroy()
         } catch (e: Exception) {
             Log.d(packageName, e.toString())

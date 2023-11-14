@@ -231,6 +231,7 @@ class MainRecyclerAdapter(val activity: MainActivity) : RecyclerView.Adapter<Mai
             BaseViewHolder(itemFooterBinding.root)
 
     override fun onItemDismiss(position: Int) {
+        //getOrNull 如果 index 超出此字符序列的范围，则返回给定 index 或 null 处的字符。
         val guid = mActivity.mainViewModel.serversCache.getOrNull(position)?.guid ?: return
         if (guid != mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER)) {
 //            mActivity.alert(R.string.del_config_comfirm) {

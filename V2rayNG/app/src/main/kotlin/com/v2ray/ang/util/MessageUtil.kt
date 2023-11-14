@@ -3,6 +3,7 @@ package com.v2ray.ang.util
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.service.V2RayTestService
 import java.io.Serializable
@@ -24,6 +25,8 @@ object MessageUtil {
             intent.component = ComponentName(ctx, V2RayTestService::class.java)
             intent.putExtra("key", what)
             intent.putExtra("content", content)
+            Log.e("key2", what.toString())
+            Log.e("content2", content.toString())
             ctx.startService(intent)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -37,6 +40,8 @@ object MessageUtil {
             intent.`package` = AppConfig.ANG_PACKAGE
             intent.putExtra("key", what)
             intent.putExtra("content", content)
+            Log.e("key1", what.toString())
+            Log.e("content1", content.toString())
             ctx.sendBroadcast(intent)
         } catch (e: Exception) {
             e.printStackTrace()

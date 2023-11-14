@@ -24,7 +24,7 @@ object MmkvManager {
 
     fun decodeServerList(): MutableList<String> {
         val json = mainStorage?.decodeString(KEY_ANG_CONFIGS)
-        Log.e("json",json.toString())
+        //String.IsNullOrBlank 是一个常用的扩展方法，用于检查字符串是否为空或者为空白字符。这个方法通常用于避免在处理字符串时出现空引用异常。
         return if (json.isNullOrBlank()) {
             mutableListOf()
         } else {
@@ -58,6 +58,7 @@ object MmkvManager {
     }
 
     fun removeServer(guid: String) {
+        //item.isBlank() 检查长度并且所有字符都是空格
         if (guid.isBlank()) {
             return
         }

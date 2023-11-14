@@ -40,7 +40,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startListenBroadcast() {
         isRunning.value = false
+         //注册广播接收器registerReceiver
         getApplication<AngApplication>().registerReceiver(mMsgReceiver, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
+        //这里发送了一个广播消息
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
@@ -52,8 +54,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
     }
 
+    /**
+     * 获取全部的节点信息
+     */
     fun reloadServerList() {
         serverList = MmkvManager.decodeServerList()
+        //ebef3939a48445749c4ba8714d57c08c
         Log.e("serverList", serverList.toString())
         updateCache()
         updateListAction.value = -1
@@ -71,12 +77,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * 增加一个节点配置
+     */
     fun appendCustomConfigServer(server: String) {
         val config = ServerConfig.create(EConfigType.CUSTOM)
         config.remarks = System.currentTimeMillis().toString()
         config.subscriptionId = subscriptionId
         config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
         val key = MmkvManager.encodeServerConfig("", config)
+        Log.e("config", config.toString())
+
         serverRawStorage?.encode(key, server)
         serverList.add(0, key)
         serversCache.add(0, ServersCache(key,config))
@@ -93,7 +104,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         serversCache.clear()
         for (guid in serverList) {
             val config = MmkvManager.decodeServerConfig(guid) ?: continue
-            Log.e("config", config.toString())
+            Log.e("updateCache-config", config.toString())
             if (subscriptionId.isNotEmpty() && subscriptionId != config.subscriptionId) {
                 continue
             }
@@ -128,6 +139,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     *   测试真实延迟
+     */
     fun testAllRealPing() {
         MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG_CANCEL, "")
         MmkvManager.clearAllTestDelayResults()
