@@ -70,7 +70,6 @@ object V2RayServiceManager {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Log.e("=====startservice=2==","V2RayProxyOnlyService")
-
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
 
