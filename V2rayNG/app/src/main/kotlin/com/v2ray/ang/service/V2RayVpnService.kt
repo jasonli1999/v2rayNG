@@ -200,6 +200,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     private fun runTun2socks() {
         val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
+        Log.e("====socksPort===", socksPort.toString())
         val cmd = arrayListOf(File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
                 "--netif-ipaddr", PRIVATE_VLAN4_ROUTER,
                 "--netif-netmask", "255.255.255.252",
