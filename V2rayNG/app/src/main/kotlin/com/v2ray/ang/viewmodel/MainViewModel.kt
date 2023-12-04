@@ -2,6 +2,7 @@ package com.v2ray.ang.viewmodel
 
 import android.app.Application
 import android.content.*
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
@@ -40,9 +41,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startListenBroadcast() {
         isRunning.value = false
-         //注册广播接收器registerReceiver
-        getApplication<AngApplication>().registerReceiver(mMsgReceiver, IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY))
-        //这里发送了一个广播消息
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getApplication<AngApplication>().registerReceiver(
+                mMsgReceiver,
+                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY),
+                Context.RECEIVER_EXPORTED
+            )
+        } else {
+            getApplication<AngApplication>().registerReceiver(
+                mMsgReceiver,
+                IntentFilter(AppConfig.BROADCAST_ACTION_ACTIVITY)
+            )
+        }
+
         MessageUtil.sendMsg2Service(getApplication(), AppConfig.MSG_REGISTER_CLIENT, "")
     }
 
