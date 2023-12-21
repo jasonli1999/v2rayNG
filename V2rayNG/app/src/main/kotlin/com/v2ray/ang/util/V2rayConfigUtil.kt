@@ -53,14 +53,14 @@ object V2rayConfigUtil {
         val result = Result(false, "")
         //取得默认配置
         val assets = Utils.readTextFromAssets(context, "v2ray_config.json")
-        Log.e("=====assets====101", assets)
+
         if (TextUtils.isEmpty(assets)) {
             return result
         }
 
         //转成Json
         val v2rayConfig = Gson().fromJson(assets, V2rayConfig::class.java) ?: return result
-        Log.e("=====v2rayConfig====102", v2rayConfig.toString())
+        Log.e("=====v2rayConfig===102", v2rayConfig.toString())
 
         v2rayConfig.log.loglevel = settingsStorage?.decodeString(AppConfig.PREF_LOGLEVEL)
                 ?: "warning"
@@ -86,7 +86,6 @@ object V2rayConfigUtil {
         }
         result.status = true
         result.content = v2rayConfig.toPrettyPrinting()
-        Log.e("=====v2rayConfig====103", result.toString())
         return result
     }
 
