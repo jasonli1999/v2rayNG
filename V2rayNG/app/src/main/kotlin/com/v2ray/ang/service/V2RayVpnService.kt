@@ -200,7 +200,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     private fun runTun2socks() {
         val socksPort = Utils.parseInt(settingsStorage?.decodeString(AppConfig.PREF_SOCKS_PORT), AppConfig.PORT_SOCKS.toInt())
-        Log.e("====socksPort===", socksPort.toString())
         val cmd = arrayListOf(File(applicationContext.applicationInfo.nativeLibraryDir, TUN2SOCKS).absolutePath,
                 "--netif-ipaddr", PRIVATE_VLAN4_ROUTER,
                 "--netif-netmask", "255.255.255.252",
@@ -209,7 +208,6 @@ class V2RayVpnService : VpnService(), ServiceControl {
                 "--sock-path", "sock_path",//File(applicationContext.filesDir, "sock_path").absolutePath,
                 "--enable-udprelay",
                 "--loglevel", "notice")
-
         if (settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) == true) {
             cmd.add("--netif-ip6addr")
             cmd.add(PRIVATE_VLAN6_ROUTER)
@@ -219,7 +217,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             cmd.add("--dnsgw")
             cmd.add("127.0.0.1:${localDnsPort}")
         }
-        Log.e(packageName, cmd.toString())
+        Log.e("====cmd====$packageName", cmd.toString())
 
         try {
             val proBuilder = ProcessBuilder(cmd)
@@ -228,32 +226,32 @@ class V2RayVpnService : VpnService(), ServiceControl {
                     .directory(applicationContext.filesDir)
                     .start()
             Thread(Runnable {
-                Log.d(packageName,"$TUN2SOCKS check")
+                Log.e(packageName,"$TUN2SOCKS check")
                 process.waitFor()
-                Log.d(packageName,"$TUN2SOCKS exited")
+                Log.e(packageName,"$TUN2SOCKS exited")
                 if (isRunning) {
-                    Log.d(packageName,"$TUN2SOCKS restart")
+                    Log.e(packageName,"$TUN2SOCKS restart")
                     runTun2socks()
                 }
             }).start()
-            Log.e(packageName, process.toString())
+            Log.e("====$packageName", process.toString())
 
             sendFd()
         } catch (e: Exception) {
-            Log.d(packageName, e.toString())
+            Log.e("====$packageName", e.toString())
         }
     }
 
     private fun sendFd() {
         val fd = mInterface.fileDescriptor
         val path = File(applicationContext.filesDir, "sock_path").absolutePath
-        Log.e(packageName, path)
+        Log.e("=======$packageName", path)
 
         GlobalScope.launch(Dispatchers.IO) {
             var tries = 0
             while (true) try {
                 Thread.sleep(50L shl tries)
-                Log.e(packageName, "sendFd tries: $tries")
+                Log.e("=======$packageName", "sendFd tries: $tries")
                 LocalSocket().use { localSocket ->
                     localSocket.connect(LocalSocketAddress(path, LocalSocketAddress.Namespace.FILESYSTEM))
                     localSocket.setFileDescriptorsForSend(arrayOf(fd))
