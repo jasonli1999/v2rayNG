@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 data class V2rayConfig(
+        var remarks: String? = null,
         var stats: Any? = null,
         val log: LogBean,
         var policy: PolicyBean?,
@@ -60,15 +61,16 @@ data class V2rayConfig(
                                 val metadataOnly: Boolean? = null)
     }
 
-    data class OutboundBean(val tag: String = "proxy",
+    data class OutboundBean(var tag: String = "proxy",
                             var protocol: String,
                             var settings: OutSettingsBean? = null,
                             var streamSettings: StreamSettingsBean? = null,
                             val proxySettings: Any? = null,
                             val sendThrough: String? = null,
-                            val mux: MuxBean? = MuxBean(false)) {
+                            var mux: MuxBean? = MuxBean(false)) {
 
         data class OutSettingsBean(var vnext: List<VnextBean>? = null,
+                                   var fragment: FragmentBean? = null,
                                    var servers: List<ServersBean>? = null,
                 /*Blackhole*/
                                    var response: Response? = null,
@@ -86,6 +88,7 @@ data class V2rayConfig(
                                    var secretKey: String? = null,
                                    val peers: List<WireGuardBean>? = null,
                                    var reserved: List<Int>? = null,
+                                   var mtu :Int? = null
         ) {
 
             data class VnextBean(var address: String = "",
@@ -99,6 +102,10 @@ data class V2rayConfig(
                                      var encryption: String = "",
                                      var flow: String = "")
             }
+
+            data class FragmentBean(var packets: String? = null,
+                                 var length: String? = null,
+                                 var interval: String? = null)
 
             data class ServersBean(var address: String = "",
                                    var method: String = "chacha20-poly1305",
@@ -128,13 +135,14 @@ data class V2rayConfig(
                                       var tcpSettings: TcpSettingsBean? = null,
                                       var kcpSettings: KcpSettingsBean? = null,
                                       var wsSettings: WsSettingsBean? = null,
+                                      var httpupgradeSettings: HttpupgradeSettingsBean? = null,
                                       var httpSettings: HttpSettingsBean? = null,
                                       var tlsSettings: TlsSettingsBean? = null,
                                       var quicSettings: QuicSettingBean? = null,
                                       var realitySettings: TlsSettingsBean? = null,
                                       var grpcSettings: GrpcSettingsBean? = null,
                                       val dsSettings: Any? = null,
-                                      val sockopt: Any? = null
+                                      var sockopt: SockoptBean? = null
         ) {
 
             data class TcpSettingsBean(var header: HeaderBean = HeaderBean(),
@@ -177,8 +185,19 @@ data class V2rayConfig(
                 data class HeadersBean(var Host: String = "")
             }
 
+            data class HttpupgradeSettingsBean(var path: String = "",
+                                               var host: String = "",
+                                               val acceptProxyProtocol: Boolean? = null)
+
             data class HttpSettingsBean(var host: List<String> = ArrayList(),
                                         var path: String = "")
+
+            data class SockoptBean(var TcpNoDelay: Boolean? = null,
+                                   var tcpKeepAliveIdle: Int? = null,
+                                   var tcpFastOpen: Boolean? = null,
+                                   var tproxy: String? = null,
+                                   var mark: Int? = null,
+                                   var dialerProxy: String? = null)
 
             data class TlsSettingsBean(var allowInsecure: Boolean = false,
                                        var serverName: String = "",
@@ -204,10 +223,12 @@ data class V2rayConfig(
             }
 
             data class GrpcSettingsBean(var serviceName: String = "",
+                                        var authority: String? = null,
                                         var multiMode: Boolean? = null)
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
-                                          quicSecurity: String?, key: String?, mode: String?, serviceName: String?): String {
+                                          quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
+                                          authority: String?): String {
                 var sni = ""
                 network = transport
                 when (network) {
@@ -245,6 +266,13 @@ data class V2rayConfig(
                         wssetting.path = path ?: "/"
                         wsSettings = wssetting
                     }
+                    "httpupgrade" -> {
+                        val httpupgradeSetting = HttpupgradeSettingsBean()
+                        httpupgradeSetting.host = host ?: ""
+                        sni = httpupgradeSetting.host
+                        httpupgradeSetting.path = path ?: "/"
+                        httpupgradeSettings = httpupgradeSetting
+                    }
                     "h2", "http" -> {
                         network = "h2"
                         val h2Setting = HttpSettingsBean()
@@ -264,7 +292,8 @@ data class V2rayConfig(
                         val grpcSetting = GrpcSettingsBean()
                         grpcSetting.multiMode = mode == "multi"
                         grpcSetting.serviceName = serviceName ?: ""
-                        sni = host ?: ""
+                        grpcSetting.authority = authority ?: ""
+                        sni = authority ?: ""
                         grpcSettings = grpcSetting
                     }
                 }
@@ -353,7 +382,8 @@ data class V2rayConfig(
         fun getTransportSettingDetails(): List<String>? {
             if (protocol.equals(EConfigType.VMESS.name, true)
                     || protocol.equals(EConfigType.VLESS.name, true)
-                    || protocol.equals(EConfigType.TROJAN.name, true)) {
+                    || protocol.equals(EConfigType.TROJAN.name, true)
+                    || protocol.equals(EConfigType.SHADOWSOCKS.name, true)) {
                 val transport = streamSettings?.network ?: return null
                 return when (transport) {
                     "tcp" -> {
@@ -374,6 +404,12 @@ data class V2rayConfig(
                                 wsSetting.headers.Host,
                                 wsSetting.path)
                     }
+                    "httpupgrade" -> {
+                        val httpupgradeSetting = streamSettings?.httpupgradeSettings ?: return null
+                        listOf("",
+                            httpupgradeSetting.host,
+                            httpupgradeSetting.path)
+                    }
                     "h2" -> {
                         val h2Setting = streamSettings?.httpSettings ?: return null
                         listOf("",
@@ -389,7 +425,7 @@ data class V2rayConfig(
                     "grpc" -> {
                         val grpcSetting = streamSettings?.grpcSettings ?: return null
                         listOf(if (grpcSetting.multiMode == true) "multi" else "gun",
-                                "",
+                                grpcSetting.authority ?: "",
                                 grpcSetting.serviceName)
                     }
                     else -> null

@@ -21,7 +21,6 @@ import com.v2ray.ang.extension.v2RayApplication
 import com.v2ray.ang.util.AppManagerUtil
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -51,7 +50,7 @@ class PerAppProxyActivity : BaseActivity() {
                 .map {
                     if (blacklist != null) {
                         it.forEach { one ->
-                            if ((blacklist.contains(one.packageName))) {
+                            if (blacklist.contains(one.packageName)) {
                                 one.isSelected = 1
                             } else {
                                 one.isSelected = 0

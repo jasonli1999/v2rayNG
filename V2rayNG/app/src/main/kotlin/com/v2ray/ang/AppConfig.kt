@@ -44,9 +44,14 @@ object AppConfig {
     const val PREF_MUX_CONCURRENCY = "pref_mux_concurency"
     const val PREF_MUX_XUDP_CONCURRENCY = "pref_mux_xudp_concurency"
     const val PREF_MUX_XUDP_QUIC = "pref_mux_xudp_quic"
+    const val PREF_FRAGMENT_ENABLED = "pref_fragment_enabled"
+    const val PREF_FRAGMENT_PACKETS = "pref_fragment_packets"
+    const val PREF_FRAGMENT_LENGTH = "pref_fragment_length"
+    const val PREF_FRAGMENT_INTERVAL = "pref_fragment_interval"
 
-    const val HTTP_PROTOCOL: String = "http://"
-    const val HTTPS_PROTOCOL: String = "https://"
+    const val PROTOCOL_HTTP: String = "http://"
+    const val PROTOCOL_HTTPS: String = "https://"
+    const val PROTOCOL_FREEDOM: String = "freedom"
 
     const val BROADCAST_ACTION_SERVICE = "com.v2ray.ang.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "com.v2ray.ang.action.activity"
@@ -61,9 +66,12 @@ object AppConfig {
     const val TAG_AGENT = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
+    const val TAG_FRAGMENT = "fragment"
 
-    const val androidpackagenamelistUrl = "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
-    const val v2rayCustomRoutingListUrl = "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
+    const val androidpackagenamelistUrl =
+        "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
+    const val v2rayCustomRoutingListUrl =
+        "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
     const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
     const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
@@ -76,6 +84,9 @@ object AppConfig {
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"
     const val PORT_HTTP = "10809"
+    const val WIREGUARD_LOCAL_ADDRESS_V4 = "172.16.0.2/32"
+    const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
+    const val WIREGUARD_LOCAL_MTU = "1420"
 
     const val MSG_REGISTER_CLIENT = 1
     const val MSG_STATE_RUNNING = 11
