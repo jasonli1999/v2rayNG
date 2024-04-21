@@ -7,6 +7,7 @@ package com.v2ray.ang
 object AppConfig {
     const val ANG_PACKAGE = BuildConfig.APPLICATION_ID
     const val DIR_ASSETS = "assets"
+    const val DIR_BACKUPS = "backups"
 
     // legacy
     const val ANG_CONFIG = "ang_config"
@@ -63,7 +64,7 @@ object AppConfig {
     const val TASKER_EXTRA_BUNDLE_GUID = "tasker_extra_bundle_guid"
     const val TASKER_DEFAULT_GUID = "Default"
 
-    const val TAG_AGENT = "proxy"
+    const val TAG_PROXY = "proxy"
     const val TAG_DIRECT = "direct"
     const val TAG_BLOCKED = "block"
     const val TAG_FRAGMENT = "fragment"
@@ -72,14 +73,17 @@ object AppConfig {
         "https://raw.githubusercontent.com/2dust/androidpackagenamelist/master/proxy.txt"
     const val v2rayCustomRoutingListUrl =
         "https://raw.githubusercontent.com/2dust/v2rayCustomRoutingList/master/"
-    const val v2rayNGIssues = "https://github.com/2dust/v2rayNG/issues"
-    const val v2rayNGWikiMode = "https://github.com/2dust/v2rayNG/wiki/Mode"
+    const val v2rayNGUrl = "https://github.com/2dust/v2rayNG"
+    const val v2rayNGIssues = "$v2rayNGUrl/issues"
+    const val v2rayNGWikiMode = "$v2rayNGUrl/wiki/Mode"
     const val v2rayNGPrivacyPolicy = "https://raw.githubusercontent.com/2dust/v2rayNG/master/CR.md"
-    const val promotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
-    const val geoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
+    const val PromotionUrl = "aHR0cHM6Ly85LjIzNDQ1Ni54eXovYWJjLmh0bWw="
+    const val GeoUrl = "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/"
+    const val TgChannelUrl = "https://t.me/github_2dust"
 
-    const val DNS_AGENT = "1.1.1.1"
+    const val DNS_PROXY = "1.1.1.1"
     const val DNS_DIRECT = "223.5.5.5"
+    const val DNS_VPN = "1.1.1.1"
 
     const val PORT_LOCAL_DNS = "10853"
     const val PORT_SOCKS = "10808"

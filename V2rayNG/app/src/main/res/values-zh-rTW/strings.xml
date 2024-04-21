@@ -135,7 +135,7 @@
     <string name="title_pref_routing_mode">轉送模式</string>
     <string name="title_pref_routing_custom">自訂轉送</string>
 
-    <string name="title_pref_remote_dns">遠端 DNS (可選)</string>
+    <string name="title_pref_remote_dns">遠端DNS (udp/tcp/https/quic)(可選)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (僅支援 IPv4/v6)</string>
@@ -170,6 +170,12 @@
     <string name="summary_pref_tg_group">加入 Telegram 群組</string>
     <string name="toast_tg_app_not_found">未找到 Telegram 應用程式</string>
     <string name="title_privacy_policy">隱私權政策</string>
+    <string name="title_about">關於</string>
+    <string name="title_source_code">原始碼</string>
+    <string name="title_tg_channel">Telegram 頻道</string>
+    <string name="title_configuration_backup">備份配置</string>
+    <string name="summary_configuration_backup">儲存位置: [%s], 卸載App或清除儲存後備份將被清除</string>
+    <string name="title_configuration_restore">還原配置</string>
 
     <string name="title_pref_promotion">推廣</string>
     <string name="summary_pref_promotion">一些推廣，輕觸以檢視 (捐贈可去除)</string>

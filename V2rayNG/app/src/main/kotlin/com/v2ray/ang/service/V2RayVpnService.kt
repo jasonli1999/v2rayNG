@@ -113,7 +113,8 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val builder = Builder()
         //val enableLocalDns = defaultDPreference.getPrefBoolean(AppConfig.PREF_LOCAL_DNS_ENABLED, false)
 
-        val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE) ?: ERoutingMode.GLOBAL_PROXY.value
+        val routingMode = settingsStorage?.decodeString(AppConfig.PREF_ROUTING_MODE)
+            ?: ERoutingMode.BYPASS_LAN_MAINLAND.value
 
         Log.e("routingMode", "setup:$routingMode ", )
 

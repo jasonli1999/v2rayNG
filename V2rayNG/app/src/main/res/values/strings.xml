@@ -148,7 +148,7 @@
     <string name="title_pref_routing_mode">Predefined rules</string>
     <string name="title_pref_routing_custom">Custom rules</string>
 
-    <string name="title_pref_remote_dns">Remote DNS (Optional)</string>
+    <string name="title_pref_remote_dns">Remote DNS (udp/tcp/https/quic)(Optional)</string>
     <string name="summary_pref_remote_dns">DNS</string>
 
     <string name="title_pref_vpn_dns">VPN DNS (only IPv4/v6)</string>
@@ -183,6 +183,12 @@
     <string name="summary_pref_tg_group">Join Telegram Group</string>
     <string name="toast_tg_app_not_found">Telegram app not found</string>
     <string name="title_privacy_policy">Privacy policy</string>
+    <string name="title_about">About</string>
+    <string name="title_source_code">Source code</string>
+    <string name="title_tg_channel">Telegram channel</string>
+    <string name="title_configuration_backup">Backup configuration</string>
+    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
+    <string name="title_configuration_restore">Restore configuration</string>
 
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
