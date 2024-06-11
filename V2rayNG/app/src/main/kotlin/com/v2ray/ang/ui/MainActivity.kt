@@ -163,10 +163,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
         }
-<<<<<<< HEAD
-        showCircle()
-=======
->>>>>>> master
+//        showCircle()
         V2RayServiceManager.startV2Ray(this)
     }
 
