@@ -475,40 +475,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from sub
      */
-<<<<<<< HEAD
-    fun importConfigViaSub()
-            : Boolean {
-        try {
-            toast(R.string.title_sub_update)
-            MmkvManager.decodeSubscriptions().forEach {
-                if (TextUtils.isEmpty(it.first)
-                        || TextUtils.isEmpty(it.second.remarks)
-                        || TextUtils.isEmpty(it.second.url)
-                ) {
-                    return@forEach
-                }
-                if (!it.second.enabled) {
-                    return@forEach
-                }
-                val url = Utils.idnToASCII(it.second.url)
-                if (!Utils.isValidUrl(url)) {
-                    return@forEach
-                }
-                Log.e(ANG_PACKAGE, url)
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val configText = try {
-                        Utils.getUrlContentWithCustomUserAgent(url)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        launch(Dispatchers.Main) {
-                            toast("\"" + it.second.remarks + "\" " + getString(R.string.toast_failure))
-                        }
-                        return@launch
-                    }
-                    launch(Dispatchers.Main) {
-                        importBatchConfig(configText, it.first)
-                    }
-=======
     private fun importConfigViaSub() : Boolean {
         val dialog = AlertDialog.Builder(this)
             .setView(LayoutProgressBinding.inflate(layoutInflater).root)
@@ -524,7 +490,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     mainViewModel.reloadServerList()
                 } else {
                     toast(R.string.toast_failure)
->>>>>>> master
                 }
                 dialog.dismiss()
             }
