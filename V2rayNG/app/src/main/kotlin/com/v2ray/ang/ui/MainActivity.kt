@@ -9,7 +9,6 @@ import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -28,9 +27,9 @@ import com.google.android.material.navigation.NavigationView
 import com.tbruyelle.rxpermissions.RxPermissions
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
-import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.ActivityMainBinding
+import com.v2ray.ang.databinding.LayoutProgressBinding
 import com.v2ray.ang.dto.EConfigType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.helper.SimpleItemTouchHelperCallback
@@ -40,12 +39,11 @@ import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.drakeet.support.toast.ToastCompat
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import java.io.File
-import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -111,8 +109,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
 
         setupViewModel()
-        copyAssets()
-        //migrateLegacy()
+        mainViewModel.copyAssets(assets)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             RxPermissions(this)
@@ -148,71 +145,29 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         mainViewModel.isRunning.observe(this) { isRunning ->
             adapter.isRunning = isRunning
             if (isRunning) {
-                if (!Utils.getDarkModeStatus(this)) {
-                    binding.fab.setImageResource(R.drawable.ic_stat_name)
-                }
-                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_orange))
+                binding.fab.setImageResource(R.drawable.ic_stop_24dp)
+                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_active))
                 setTestState(getString(R.string.connection_connected))
                 binding.layoutTest.isFocusable = true
             } else {
-                if (!Utils.getDarkModeStatus(this)) {
-                    binding.fab.setImageResource(R.drawable.ic_stat_name)
-                }
-                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_grey))
+                binding.fab.setImageResource(R.drawable.ic_play_24dp)
+                binding.fab.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.color_fab_inactive))
                 setTestState(getString(R.string.connection_not_connected))
                 binding.layoutTest.isFocusable = false
             }
-            hideCircle()
         }
         mainViewModel.startListenBroadcast()
     }
-
-    private fun copyAssets() {
-        val extFolder = Utils.userAssetPath(this)
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val geo = arrayOf("geosite.dat", "geoip.dat")
-                assets.list("")
-                        ?.filter { geo.contains(it) }
-                        ?.filter { !File(extFolder, it).exists() }
-                        ?.forEach {
-                            val target = File(extFolder, it)
-                            assets.open(it).use { input ->
-                                FileOutputStream(target).use { output ->
-                                    input.copyTo(output)
-                                }
-                            }
-                            Log.i(ANG_PACKAGE, "Copied from apk assets folder to ${target.absolutePath}")
-                        }
-            } catch (e: Exception) {
-                Log.e(ANG_PACKAGE, "asset copy failed", e)
-            }
-        }
-    }
-
-//    private fun migrateLegacy() {
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            val result = AngConfigManager.migrateLegacyConfig(this@MainActivity)
-//            if (result != null) {
-//                launch(Dispatchers.Main) {
-//                    if (result) {
-//                        toast(getString(R.string.migration_success))
-//                        mainViewModel.reloadServerList()
-//                    } else {
-//                        toast(getString(R.string.migration_fail))
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     fun startV2Ray() {
         if (mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER).isNullOrEmpty()) {
             return
         }
+<<<<<<< HEAD
         showCircle()
+=======
+>>>>>>> master
         V2RayServiceManager.startV2Ray(this)
-        hideCircle()
     }
 
     fun restartV2Ray() {
@@ -290,11 +245,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             true
         }
 
-//        R.id.sub_setting -> {
-//            startActivity<SubSettingActivity>()
-//            true
-//        }
-
         R.id.sub_update -> {
             importConfigViaSub()
             true
@@ -330,6 +280,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                         MmkvManager.removeAllServer()
                         mainViewModel.reloadServerList()
                     }
+                    .setNegativeButton(android.R.string.no) {_, _ ->
+                        //do noting
+                    }
                     .show()
             true
         }
@@ -337,6 +290,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             AlertDialog.Builder(this).setMessage(R.string.del_config_comfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     mainViewModel.removeDuplicateServer()
+                    mainViewModel.reloadServerList()
+                }
+                .setNegativeButton(android.R.string.no) {_, _ ->
+                    //do noting
                 }
                 .show()
             true
@@ -346,6 +303,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     MmkvManager.removeInvalidServer()
                     mainViewModel.reloadServerList()
+                }
+                .setNegativeButton(android.R.string.no) {_, _ ->
+                    //do noting
                 }
                 .show()
             true
@@ -375,7 +335,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from qrcode
      */
-    fun importQRcode(forConfig: Boolean): Boolean {
+    private fun importQRcode(forConfig: Boolean): Boolean {
 //        try {
 //            startActivityForResult(Intent("com.google.zxing.client.android.SCAN")
 //                    .addCategory(Intent.CATEGORY_DEFAULT)
@@ -411,7 +371,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from clipboard
      */
-    fun importClipboard()
+    private fun importClipboard()
             : Boolean {
         try {
             val clipboard = Utils.getClipboard(this)
@@ -423,30 +383,28 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    fun importBatchConfig(server: String?, subid: String = "") {
-        val subid2 = if(subid.isNullOrEmpty()){
-            mainViewModel.subscriptionId
-        }else{
-            subid
-        }
-        val append = subid.isNullOrEmpty()
+    private fun importBatchConfig(server: String?) {
+        val dialog = AlertDialog.Builder(this)
+            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
+            .setCancelable(false)
+            .show()
 
-        var count = AngConfigManager.importBatchConfig(server, subid2, append)
-        if (count <= 0) {
-            count = AngConfigManager.importBatchConfig(Utils.decode(server!!), subid2, append)
-        }
-        if (count <= 0) {
-            count = AngConfigManager.appendCustomConfigServer(server, subid2)
-        }
-        if (count > 0) {
-            toast(R.string.toast_success)
-            mainViewModel.reloadServerList()
-        } else {
-            toast(R.string.toast_failure)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val count = AngConfigManager.importBatchConfig(server, mainViewModel.subscriptionId, true)
+            delay(500L)
+            launch(Dispatchers.Main) {
+                if (count > 0) {
+                    toast(R.string.toast_success)
+                    mainViewModel.reloadServerList()
+                } else {
+                    toast(R.string.toast_failure)
+                }
+                dialog.dismiss()
+            }
         }
     }
 
-    fun importConfigCustomClipboard()
+    private fun importConfigCustomClipboard()
             : Boolean {
         try {
             val configText = Utils.getClipboard(this)
@@ -465,7 +423,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from local config file
      */
-    fun importConfigCustomLocal(): Boolean {
+    private fun importConfigCustomLocal(): Boolean {
         try {
             showFileChooser()
         } catch (e: Exception) {
@@ -475,7 +433,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         return true
     }
 
-    fun importConfigCustomUrlClipboard()
+    private fun importConfigCustomUrlClipboard()
             : Boolean {
         try {
             val url = Utils.getClipboard(this)
@@ -493,7 +451,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from url
      */
-    fun importConfigCustomUrl(url: String?): Boolean {
+    private fun importConfigCustomUrl(url: String?): Boolean {
         try {
             if (!Utils.isValidUrl(url)) {
                 toast(R.string.toast_invalid_url)
@@ -520,6 +478,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import config from sub
      */
+<<<<<<< HEAD
     fun importConfigViaSub()
             : Boolean {
         try {
@@ -552,11 +511,26 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     launch(Dispatchers.Main) {
                         importBatchConfig(configText, it.first)
                     }
+=======
+    private fun importConfigViaSub() : Boolean {
+        val dialog = AlertDialog.Builder(this)
+            .setView(LayoutProgressBinding.inflate(layoutInflater).root)
+            .setCancelable(false)
+            .show()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val count = AngConfigManager.updateConfigViaSubAll()
+            delay(500L)
+            launch(Dispatchers.Main) {
+                if (count > 0) {
+                    toast(R.string.toast_success)
+                    mainViewModel.reloadServerList()
+                } else {
+                    toast(R.string.toast_failure)
+>>>>>>> master
                 }
+                dialog.dismiss()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
         }
         return true
     }
@@ -611,15 +585,18 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     /**
      * import customize config
      */
-    fun importCustomizeConfig(server: String?) {
+    private fun importCustomizeConfig(server: String?) {
         try {
             if (server == null || TextUtils.isEmpty(server)) {
                 toast(R.string.toast_none_data)
                 return
             }
-            mainViewModel.appendCustomConfigServer(server)
-            mainViewModel.reloadServerList()
-            toast(R.string.toast_success)
+            if (mainViewModel.appendCustomConfigServer(server)) {
+                mainViewModel.reloadServerList()
+                toast(R.string.toast_success)
+            } else {
+                toast(R.string.toast_failure)
+            }
             //adapter.notifyItemInserted(mainViewModel.serverList.lastIndex)
         } catch (e: Exception) {
             ToastCompat.makeText(this, "${getString(R.string.toast_malformed_josn)} ${e.cause?.message}", Toast.LENGTH_LONG).show()
@@ -628,7 +605,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    fun setTestState(content: String?) {
+    private fun setTestState(content: String?) {
         binding.tvTestState.text = content
     }
 
@@ -647,29 +624,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             return true
         }
         return super.onKeyDown(keyCode, event)
-    }
-
-
-    fun showCircle() {
-        binding.fabProgressCircle.show()
-    }
-
-    fun hideCircle() {
-        try {
-            Observable.timer(300, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        try {
-                            if (binding.fabProgressCircle.isShown) {
-                                binding.fabProgressCircle.hide()
-                            }
-                        } catch (e: Exception) {
-                            Log.w(ANG_PACKAGE, e)
-                        }
-                    }
-        } catch (e: Exception) {
-            Log.d(ANG_PACKAGE, e.toString())
-        }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

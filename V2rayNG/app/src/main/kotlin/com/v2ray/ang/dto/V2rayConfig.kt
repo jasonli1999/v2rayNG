@@ -60,7 +60,8 @@ data class V2rayConfig(
 
         data class SniffingBean(var enabled: Boolean,
                                 val destOverride: ArrayList<String>,
-                                val metadataOnly: Boolean? = null)
+                                val metadataOnly: Boolean? = null,
+                                var routeOnly: Boolean? = null)
     }
 
     data class OutboundBean(var tag: String = "proxy",
@@ -156,7 +157,7 @@ data class V2rayConfig(
                                            var headers: HeadersBean = HeadersBean(),
                                            val version: String? = null,
                                            val method: String? = null) {
-                        data class HeadersBean(var Host: List<String> = ArrayList(),
+                        data class HeadersBean(var Host: List<String>? = ArrayList(),
                                                @SerializedName("User-Agent")
                                                val userAgent: List<String>? = null,
                                                @SerializedName("Accept-Encoding")
@@ -226,7 +227,10 @@ data class V2rayConfig(
 
             data class GrpcSettingsBean(var serviceName: String = "",
                                         var authority: String? = null,
-                                        var multiMode: Boolean? = null)
+                                        var multiMode: Boolean? = null,
+                                        var idle_timeout: Int? = null,
+                                        var health_check_timeout: Int? = null
+                )
 
             fun populateTransportSettings(transport: String, headerType: String?, host: String?, path: String?, seed: String?,
                                           quicSecurity: String?, key: String?, mode: String?, serviceName: String?,
@@ -243,7 +247,7 @@ data class V2rayConfig(
                                 requestObj.headers.Host = (host ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 requestObj.path = (path ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }
                                 tcpSetting.header.request = requestObj
-                                sni = requestObj.headers.Host.getOrNull(0) ?: sni
+                                sni = requestObj.headers.Host?.getOrNull(0) ?: sni
                             }
                         } else {
                             tcpSetting.header.type = "none"
@@ -295,6 +299,8 @@ data class V2rayConfig(
                         grpcSetting.multiMode = mode == "multi"
                         grpcSetting.serviceName = serviceName ?: ""
                         grpcSetting.authority = authority ?: ""
+                        grpcSetting.idle_timeout = 60
+                        grpcSetting.health_check_timeout = 20
                         sni = authority ?: ""
                         grpcSettings = grpcSetting
                     }
@@ -489,7 +495,7 @@ data class V2rayConfig(
                            var poolSize: Int = 10000) // roughly 10 times smaller than total ip pool
 
     fun getProxyOutbound(): OutboundBean? {
-        outbounds.forEach { outbound ->
+        outbounds?.forEach { outbound ->
             EConfigType.entries.forEach {
                 if (outbound.protocol.equals(it.name, true)) {
                     return outbound

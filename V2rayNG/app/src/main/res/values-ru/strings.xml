@@ -85,6 +85,7 @@
     <string name="title_user_asset_add_url">Добавить URL ресурса</string>
     <string name="msg_file_not_found">Файл не найден</string>
     <string name="msg_remark_is_duplicate">Описание уже существует</string>
+    <string name="toast_action_not_allowed">Это действие запрещено</string>
 
     <!-- PerAppProxyActivity -->
     <string name="msg_dialog_progress">Загрузка…</string>
@@ -121,7 +122,10 @@
     <string name="summary_pref_speed_enabled">Показывать текущую скорость в уведомлении.\nЗначок будет меняться в зависимости от использования.</string>
 
     <string name="title_pref_sniffing_enabled">Анализ пакетов</string>
-    <string name="summary_pref_sniffing_enabled">Использовать анализ пакетов (по умолчанию включено)</string>
+    <string name="summary_pref_sniffing_enabled">Использовать определение доменных имён в пакетах (по умолчанию включено)</string>
+    <string name="title_pref_route_only_enabled">Домен только для маршрутизации</string>
+    <string name="summary_pref_route_only_enabled">Использовать определённое доменное имя только для маршрутизации и сохранять целевой адрес в виде IP.</string>
+
 
     <string name="title_pref_local_dns_enabled">Использовать локальную DNS</string>
     <string name="summary_pref_local_dns_enabled">Обслуживание выполняется DNS-модулем ядра (в настройках маршрутизации рекомендуется выбрать режим «Все, кроме LAN и Китая»)</string>
@@ -144,6 +148,9 @@
 
     <string name="title_pref_domestic_dns">Внутренняя DNS (необязательно)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_delay_test_url">Сервис проверки времени отклика (HTTP/HTTPS)</string>
+    <string name="summary_pref_delay_test_url">URL</string>
 
     <string name="title_pref_proxy_sharing_enabled">Разрешать подключения из LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Другие устройства могут подключаться, используя ваш IP-адрес, чтобы использовать прокси по протоколам SOCKS/HTTP. Используйте только в доверенной сети, чтобы избежать несанкционированного подключения.</string>
@@ -175,9 +182,10 @@
     <string name="title_about">О приложении</string>
     <string name="title_source_code">Исходный код</string>
     <string name="title_tg_channel">Telegram-канал</string>
-    <string name="title_configuration_backup">Backup configuration</string>
-    <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
-    <string name="title_configuration_restore">Restore configuration</string>
+    <string name="title_configuration_backup">Резервирование конфигурации</string>
+    <string name="summary_configuration_backup">Путь: [%s]. Резервная копия будет стёрта при удалении приложения или очистке хранилища.</string>
+    <string name="title_configuration_restore">Восстановление конфигурации</string>
+    <string name="title_configuration_share">Поделиться конфигурацией</string>
 
     <string name="title_pref_promotion">Содействие</string>
     <string name="summary_pref_promotion">Содействие, нажмите для получения подробной информации (пожертвование может быть удалено)</string>
@@ -191,6 +199,7 @@
     <string name="title_mode_help">Нажмите для получения дополнительной информации</string>
     <string name="title_language">Язык</string>
     <string name="title_ui_settings">Настройки интерфейса</string>
+    <string name="title_pref_ui_mode_night">Тема интерфейса</string>
 
     <string name="title_logcat">Журнал</string>
     <string name="logcat_copy">Копировать</string>
@@ -270,6 +279,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>Только прокси</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>Как в системе</item>
+        <item>Светлая</item>
+        <item>Тёмная</item>
     </string-array>
 
 </resources>

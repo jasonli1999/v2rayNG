@@ -80,6 +80,7 @@
     <string name="toast_asset_copy_failed">کپی فایل انجام نشد، لطفا از برنامه مدیریت فایل استفاده کنید</string>
     <string name="menu_item_add_file">افزودن فایل‌ها</string>
     <string name="menu_item_download_file">دانلود فایل‌ها</string>
+    <string name="toast_action_not_allowed">این عمل ممنوع است</string>
 
     <!-- PerAppProxyActivity -->
     <string name="title_user_asset_add_url">URL را اضافه کنید</string>
@@ -119,6 +120,9 @@
 
     <string name="title_pref_sniffing_enabled">فعال کردن Sniffing</string>
     <string name="summary_pref_sniffing_enabled">دامنه sniff را از بسته امتحان کنید (پیش‌فرض روشن)</string>
+    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
+
 
     <string name="title_pref_local_dns_enabled">فعال کردن DNS محلی</string>
     <string name="summary_pref_local_dns_enabled">DNS پردازش شده توسط ماژول DNS هسته (توصیه می‌شود، در صورت نیاز به دور زدن LAN و نشانی mainland)</string>
@@ -141,6 +145,9 @@
 
     <string name="title_pref_domestic_dns">DNS داخلی (اختیاری)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
+    <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">اجازه اتصالات از طریق LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">دستگاه‌های دیگر می‌توانند از طریق socks/http به پراکسی توسط نشانی آی‌پی شما متصل شوند، فقط در شبکه مورد اعتماد فعال می‌شوند تا از اتصال غیرمجاز جلوگیری کنند</string>
@@ -176,6 +183,7 @@
     <string name="title_configuration_backup">Backup configuration</string>
     <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
+    <string name="title_configuration_share">Share configuration</string>
     <string name="title_pref_promotion">تبلیغات</string>
     <string name="summary_pref_promotion">تبلیغات، برای جزئیات بیشتر کلیک کنید (کمک مالی کنید تا حذف شود)</string>
 
@@ -187,6 +195,7 @@
     <string name="title_mode_help">برای راهنمایی بیشتر روی این متن، کلیک کنید</string>
     <string name="title_language">زبان</string>
     <string name="title_ui_settings">تنظیمات رابط کاربری</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">گزارشات</string>
     <string name="logcat_copy">کپی</string>
@@ -268,5 +277,11 @@
     </string-array>
     <string name="menu_item_add_asset">افزودن</string>
     <string name="menu_item_add_url">افزودن لینک</string>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
 
 </resources>

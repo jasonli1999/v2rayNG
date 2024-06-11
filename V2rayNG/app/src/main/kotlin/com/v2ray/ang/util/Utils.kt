@@ -16,6 +16,7 @@ import android.util.Base64
 import android.util.Log
 import android.util.Patterns
 import android.webkit.URLUtil
+import androidx.appcompat.app.AppCompatDelegate
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
@@ -38,8 +39,8 @@ object Utils {
      * @param text
      * @return
      */
-    fun getEditable(text: String): Editable {
-        return Editable.Factory.getInstance().newEditable(text)
+    fun getEditable(text: String?): Editable {
+        return Editable.Factory.getInstance().newEditable(text?:"")
     }
 
     /**
@@ -100,16 +101,16 @@ object Utils {
     /**
      * base64 decode
      */
-    fun decode(text: String): String {
+    fun decode(text: String?): String {
         tryDecodeBase64(text)?.let { return it }
-        if (text.endsWith('=')) {
+        if (text?.endsWith('=')==true) {
             // try again for some loosely formatted base64
             tryDecodeBase64(text.trimEnd('='))?.let { return it }
         }
         return ""
     }
 
-    fun tryDecodeBase64(text: String): String? {
+    fun tryDecodeBase64(text: String?): String? {
         try {
             return Base64.decode(text, Base64.NO_WRAP).toString(charset("UTF-8"))
         } catch (e: Exception) {
@@ -148,9 +149,7 @@ object Utils {
     }
 
     fun getVpnDnsServers(): List<String> {
-        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)
-                ?: settingsStorage?.decodeString(AppConfig.PREF_REMOTE_DNS)
-                ?: AppConfig.DNS_VPN
+        val vpnDns = settingsStorage?.decodeString(AppConfig.PREF_VPN_DNS)?:AppConfig.DNS_VPN
         return vpnDns.split(",").filter { isPureIpAddress(it) }
         // allow empty, in that case dns will use system default
     }
@@ -160,7 +159,7 @@ object Utils {
      */
     fun getDomesticDnsServers(): List<String> {
         val domesticDns = settingsStorage?.decodeString(AppConfig.PREF_DOMESTIC_DNS) ?: AppConfig.DNS_DIRECT
-        val ret = domesticDns.split(",").filter { isPureIpAddress(it) }
+        val ret = domesticDns.split(",").filter { isPureIpAddress(it) || isCoreDNSAddress(it) }
         if (ret.isEmpty()) {
             return listOf(AppConfig.DNS_DIRECT)
         }
@@ -303,7 +302,11 @@ object Utils {
     /**
      * readTextFromAssets
      */
-    fun readTextFromAssets(context: Context, fileName: String): String {
+    fun readTextFromAssets(context: Context?, fileName: String): String {
+        if(context == null)
+        {
+            return ""
+        }
         val content = context.assets.open(fileName).bufferedReader().use {
             it.readText()
         }
@@ -353,9 +356,18 @@ object Utils {
     }
 
     @Throws(IOException::class)
-    fun getUrlContentWithCustomUserAgent(urlStr: String?): String {
+    fun getUrlContentWithCustomUserAgent(urlStr: String?, httpPort: Int = 0): String {
         val url = URL(urlStr)
-        val conn = url.openConnection()
+        val conn = if (httpPort == 0) {
+            url.openConnection()
+        } else {
+            url.openConnection(
+                Proxy(
+                    Proxy.Type.HTTP,
+                    InetSocketAddress("127.0.0.1", httpPort)
+                )
+            )
+        }
         conn.setRequestProperty("Connection", "close")
         conn.setRequestProperty("User-agent", "v2rayNG/${BuildConfig.VERSION_NAME}")
         url.userInfo?.let {
@@ -373,7 +385,18 @@ object Utils {
         return mode != UI_MODE_NIGHT_NO
     }
 
-    fun getIpv6Address(address: String): String {
+    fun setNightMode(context: Context) {
+        when (settingsStorage?.decodeString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
+            "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }
+    }
+
+    fun getIpv6Address(address: String?): String {
+        if(address == null){
+            return ""
+        }
         return if (isIpv6Address(address) && !address.contains('[') && !address.contains(']')) {
             String.format("[%s]", address)
         } else {
@@ -418,5 +441,18 @@ object Utils {
     fun isTv(context: Context): Boolean =
         context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
+    fun getDelayTestUrl(): String {
+        val url = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL)
+        return if (url.isNullOrEmpty()) AppConfig.DelayTestUrl else url
+    }
+
+    fun getDelayTestUrl(second: Boolean = false): String {
+        return if (second) {
+            AppConfig.DelayTestUrl2
+        } else {
+            val url = settingsStorage.decodeString(AppConfig.PREF_DELAY_TEST_URL)
+            if (url.isNullOrEmpty()) AppConfig.DelayTestUrl else url
+        }
+    }
 }
 

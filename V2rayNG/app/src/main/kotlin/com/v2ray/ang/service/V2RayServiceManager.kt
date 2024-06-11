@@ -1,6 +1,9 @@
 package com.v2ray.ang.service
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -60,6 +63,11 @@ object V2RayServiceManager {
     private var mNotificationManager: NotificationManager? = null
 
     fun startV2Ray(context: Context) {
+        if (v2rayPoint.isRunning) return
+        val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
+        val result = V2rayConfigUtil.getV2rayConfig(context, guid)
+        if (!result.status) return
+
         if (settingsStorage?.decodeBool(AppConfig.PREF_PROXY_SHARING) == true) {
             context.toast(R.string.toast_warning_pref_proxysharing_short)
         } else {
@@ -127,42 +135,43 @@ object V2RayServiceManager {
         val service = serviceControl?.get()?.getService() ?: return
         val guid = mainStorage?.decodeString(MmkvManager.KEY_SELECTED_SERVER) ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
-        if (!v2rayPoint.isRunning) {
-            val result = V2rayConfigUtil.getV2rayConfig(service, guid)
-            if (!result.status)
-                return
+        if (v2rayPoint.isRunning) {
+            return
+        }
+        val result = V2rayConfigUtil.getV2rayConfig(service, guid)
+        if (!result.status)
+            return
 
-            try {
-                val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
-                mFilter.addAction(Intent.ACTION_SCREEN_ON)
-                mFilter.addAction(Intent.ACTION_SCREEN_OFF)
-                mFilter.addAction(Intent.ACTION_USER_PRESENT)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    service.registerReceiver(mMsgReceive, mFilter, Context.RECEIVER_EXPORTED)
-                } else {
-                    service.registerReceiver(mMsgReceive, mFilter)
-                }
-            } catch (e: Exception) {
-                Log.d(ANG_PACKAGE, e.toString())
-            }
-
-            v2rayPoint.configureFileContent = result.content
-            v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
-            currentConfig = config
-
-            try {
-                v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
-            } catch (e: Exception) {
-                Log.d(ANG_PACKAGE, e.toString())
-            }
-
-            if (v2rayPoint.isRunning) {
-                MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-                showNotification()
+        try {
+            val mFilter = IntentFilter(AppConfig.BROADCAST_ACTION_SERVICE)
+            mFilter.addAction(Intent.ACTION_SCREEN_ON)
+            mFilter.addAction(Intent.ACTION_SCREEN_OFF)
+            mFilter.addAction(Intent.ACTION_USER_PRESENT)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                service.registerReceiver(mMsgReceive, mFilter, Context.RECEIVER_EXPORTED)
             } else {
-                MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
-                cancelNotification()
+                service.registerReceiver(mMsgReceive, mFilter)
             }
+        } catch (e: Exception) {
+            Log.d(ANG_PACKAGE, e.toString())
+        }
+
+        v2rayPoint.configureFileContent = result.content
+        v2rayPoint.domainName = config.getV2rayPointDomainAndPort()
+        currentConfig = config
+
+        try {
+            v2rayPoint.runLoop(settingsStorage?.decodeBool(AppConfig.PREF_PREFER_IPV6) ?: false)
+        } catch (e: Exception) {
+            Log.d(ANG_PACKAGE, e.toString())
+        }
+
+        if (v2rayPoint.isRunning) {
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
+            showNotification()
+        } else {
+            MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
+            cancelNotification()
         }
     }
 
@@ -238,10 +247,18 @@ object V2RayServiceManager {
             var errstr = ""
             if (v2rayPoint.isRunning) {
                 try {
-                    time = v2rayPoint.measureDelay()
+                    time = v2rayPoint.measureDelay(Utils.getDelayTestUrl())
                 } catch (e: Exception) {
                     Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
                     errstr = e.message?.substringAfter("\":") ?: "empty message"
+                }
+                if (time == -1L) {
+                    try {
+                        time = v2rayPoint.measureDelay(Utils.getDelayTestUrl(true))
+                    } catch (e: Exception) {
+                        Log.d(ANG_PACKAGE, "measureV2rayDelay: $e")
+                        errstr = e.message?.substringAfter("\":") ?: "empty message"
+                    }
                 }
             }
             val result = if (time == -1L) {
@@ -294,7 +311,7 @@ object V2RayServiceManager {
                 .setShowWhen(false)
                 .setOnlyAlertOnce(true)
                 .setContentIntent(contentPendingIntent)
-                .addAction(R.drawable.ic_close_grey_800_24dp,
+                .addAction(R.drawable.ic_delete_24dp,
                         service.getString(R.string.notification_action_stop_v2ray),
                         stopV2RayPendingIntent)
         //.build()

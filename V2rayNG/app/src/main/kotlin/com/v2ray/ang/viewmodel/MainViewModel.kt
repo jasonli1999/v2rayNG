@@ -1,7 +1,12 @@
 package com.v2ray.ang.viewmodel
 
 import android.app.Application
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,12 +22,25 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
 import com.v2ray.ang.R
 import com.v2ray.ang.databinding.DialogConfigFilterBinding
-import com.v2ray.ang.dto.*
+import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.dto.ServerConfig
+import com.v2ray.ang.dto.ServersCache
+import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.extension.toast
-import com.v2ray.ang.util.*
+import com.v2ray.ang.util.MessageUtil
+import com.v2ray.ang.util.MmkvManager
 import com.v2ray.ang.util.MmkvManager.KEY_ANG_CONFIGS
-import kotlinx.coroutines.*
-import java.util.*
+import com.v2ray.ang.util.SpeedtestUtil
+import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.V2rayConfigUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.util.Collections
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val mainStorage by lazy {
@@ -45,8 +63,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     var serverList = MmkvManager.decodeServerList()
-    var subscriptionId: String = settingsStorage.decodeString(AppConfig.CACHE_SUBSCRIPTION_ID, "")!!
-    var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")!!
+    var subscriptionId: String = settingsStorage.decodeString(AppConfig.CACHE_SUBSCRIPTION_ID, "")?:""
+    var keywordFilter: String = settingsStorage.decodeString(AppConfig.CACHE_KEYWORD_FILTER, "")?:""
         private set
     val serversCache = mutableListOf<ServersCache>()
     val isRunning by lazy { MutableLiveData<Boolean>() }
@@ -104,6 +122,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+<<<<<<< HEAD
     /**
      * 增加一个节点配置
      */
@@ -118,6 +137,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         serverRawStorage?.encode(key, server)
         serverList.add(0, key)
         serversCache.add(0, ServersCache(key, config))
+=======
+    fun appendCustomConfigServer(server: String): Boolean {
+        if (server.contains("inbounds")
+            && server.contains("outbounds")
+            && server.contains("routing")
+        ) {
+            try {
+                val config = ServerConfig.create(EConfigType.CUSTOM)
+                config.subscriptionId = subscriptionId
+                config.fullConfig = Gson().fromJson(server, V2rayConfig::class.java)
+                config.remarks = config.fullConfig?.remarks ?: System.currentTimeMillis().toString()
+                val key = MmkvManager.encodeServerConfig("", config)
+                serverRawStorage?.encode(key, server)
+                serverList.add(0, key)
+                serversCache.add(0, ServersCache(key, config))
+                return true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        return false
+>>>>>>> master
     }
 
     fun swapServer(fromPosition: Int, toPosition: Int) {
@@ -145,7 +186,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun testAllTcping() {
         tcpingTestScope.coroutineContext[Job]?.cancelChildren()
         SpeedtestUtil.closeAllTcpSockets()
-        MmkvManager.clearAllTestDelayResults()
+        MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
         updateListAction.value = -1 // update all
 
         getApplication<AngApplication>().toast(R.string.connection_test_testing)
@@ -171,7 +212,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun testAllRealPing() {
         MessageUtil.sendMsg2TestService(getApplication(), AppConfig.MSG_MEASURE_CONFIG_CANCEL, "")
-        MmkvManager.clearAllTestDelayResults()
+        MmkvManager.clearAllTestDelayResults(serversCache.map { it.guid }.toList())
         updateListAction.value = -1 // update all
 
         val serversCopy = serversCache.toList() // Create a copy of the list
@@ -276,13 +317,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         for (it in deleteServer) {
             MmkvManager.removeServer(it)
         }
-        reloadServerList()
         getApplication<AngApplication>().toast(
             getApplication<AngApplication>().getString(
                 R.string.title_del_duplicate_config_count,
                 deleteServer.count()
             )
         )
+    }
+
+    fun copyAssets(assets: AssetManager) {
+        val extFolder = Utils.userAssetPath(getApplication<AngApplication>())
+        viewModelScope.launch(Dispatchers.Default) {
+            try {
+                val geo = arrayOf("geosite.dat", "geoip.dat")
+                assets.list("")
+                    ?.filter { geo.contains(it) }
+                    ?.filter { !File(extFolder, it).exists() }
+                    ?.forEach {
+                        val target = File(extFolder, it)
+                        assets.open(it).use { input ->
+                            FileOutputStream(target).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        Log.i(
+                            ANG_PACKAGE,
+                            "Copied from apk assets folder to ${target.absolutePath}"
+                        )
+                    }
+            } catch (e: Exception) {
+                Log.e(ANG_PACKAGE, "asset copy failed", e)
+            }
+        }
     }
 
     private val mMsgReceiver = object : BroadcastReceiver() {

@@ -48,7 +48,7 @@
                         android:id="@+id/layout_test"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/connection_test_height"
-                        android:background="@color/colorMainTestBg"
+                        android:background="@color/colorPrimary"
                         android:gravity="center|start"
                         android:nextFocusRight="@+id/fab"
                         android:clickable="true"
@@ -63,14 +63,13 @@
                             android:minLines="1"
                             android:paddingStart="16dp"
                             android:text="@string/connection_test_pending"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                            android:textColor="@color/colorText" />
+                            android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
 
                     </LinearLayout>
                 </LinearLayout>
 
 
-                <com.github.jorgecastilloprz.FABProgressCircle
+                <FrameLayout
                     android:id="@+id/fabProgressCircle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +93,7 @@
                         android:src="@drawable/ic_stat_name"
                         app:layout_anchorGravity="bottom|right|end" />
 
-                </com.github.jorgecastilloprz.FABProgressCircle>
+                </FrameLayout>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </RelativeLayout>
     </LinearLayout>

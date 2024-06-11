@@ -5,7 +5,12 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig
@@ -209,7 +214,7 @@ class ServerActivity : BaseActivity() {
     }
 
     /**
-     * bingding seleced server config
+     * binding selected server config
      */
     private fun bindingServer(config: ServerConfig): Boolean {
         val outbound = config.getProxyOutbound() ?: return false
@@ -285,7 +290,7 @@ class ServerActivity : BaseActivity() {
                 tlsSetting.alpn?.let {
                     val alpnIndex = Utils.arrayFind(
                         alpns,
-                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString())!!
+                        Utils.removeWhiteSpace(tlsSetting.alpn.joinToString())?:""
                     )
                     sp_stream_alpn?.setSelection(alpnIndex)
                 }
@@ -413,7 +418,7 @@ class ServerActivity : BaseActivity() {
             saveStreamSettings(it)
         }
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
-            config.subscriptionId = subscriptionId!!
+            config.subscriptionId = subscriptionId?:""
         }
 
         MmkvManager.encodeServerConfig(editGuid, config)
@@ -560,11 +565,16 @@ class ServerActivity : BaseActivity() {
                             MmkvManager.removeServer(editGuid)
                             finish()
                         }
+                        .setNegativeButton(android.R.string.no) { _, _ ->
+                            // do nothing
+                        }
                         .show()
                 } else {
                     MmkvManager.removeServer(editGuid)
                     finish()
                 }
+            } else {
+                application.toast(R.string.toast_action_not_allowed)
             }
         }
         return true

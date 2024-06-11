@@ -93,6 +93,7 @@
     <string name="title_user_asset_add_url">Add asset URL</string>
     <string name="msg_file_not_found">File not found</string>
     <string name="msg_remark_is_duplicate">The remarks already exists</string>
+    <string name="toast_action_not_allowed">Action not allowed</string>
 
 
     <!-- PerAppProxyActivity -->
@@ -132,6 +133,8 @@
 
     <string name="title_pref_sniffing_enabled">Enable Sniffing</string>
     <string name="summary_pref_sniffing_enabled">Try sniff domain from the packet (default on)</string>
+    <string name="title_pref_route_only_enabled">Enable routeOnly</string>
+    <string name="summary_pref_route_only_enabled">Use the sniffed domain name for routing only, and keep the target address as the IP address.</string>
 
     <string name="title_pref_local_dns_enabled">Enable local DNS</string>
     <string name="summary_pref_local_dns_enabled">DNS processed by core‘s DNS module (Recommended, if need routing Bypassing LAN and
@@ -155,6 +158,9 @@
 
     <string name="title_pref_domestic_dns">Domestic DNS (Optional)</string>
     <string name="summary_pref_domestic_dns">DNS</string>
+
+    <string name="title_pref_delay_test_url">True delay test url (http/https)</string>
+    <string name="summary_pref_delay_test_url">Url</string>
 
     <string name="title_pref_proxy_sharing_enabled">Allow connections from the LAN</string>
     <string name="summary_pref_proxy_sharing_enabled">Other devices can connect to proxy by your ip address through socks/http, Only enable in trusted network to avoid unauthorized connection</string>
@@ -189,6 +195,7 @@
     <string name="title_configuration_backup">Backup configuration</string>
     <string name="summary_configuration_backup">Storage location: [%s], The backup will be cleared after uninstalling the app or clearing the storage</string>
     <string name="title_configuration_restore">Restore configuration</string>
+    <string name="title_configuration_share">Share configuration</string>
 
     <string name="title_pref_promotion">Promotion</string>
     <string name="summary_pref_promotion">Promotion,click for details(Donation can be removed)</string>
@@ -202,6 +209,7 @@
     <string name="title_mode_help">Click me for more help</string>
     <string name="title_language">Language</string>
     <string name="title_ui_settings">UI settings</string>
+    <string name="title_pref_ui_mode_night">UI mode settings</string>
 
     <string name="title_logcat">Logcat</string>
     <string name="logcat_copy">Copy</string>
@@ -281,6 +289,12 @@
     <string-array name="mode_entries">
         <item>VPN</item>
         <item>Proxy only</item>
+    </string-array>
+
+    <string-array name="ui_mode_night">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
     </string-array>
 
 </resources>
